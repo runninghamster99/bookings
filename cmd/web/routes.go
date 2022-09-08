@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/runninghamster99/bookings/pkg/config"
-	"github.com/runninghamster99/bookings/pkg/handlers"
+	"github.com/runninghamster99/bookings/internal/config"
+	"github.com/runninghamster99/bookings/internal/handlers"
 )
 
 
@@ -30,7 +30,7 @@ func Routes(app *config.AppConfig) http.Handler {
 	mux.Use(middleware.Recoverer)
 
 	//using middleware function write to console from middleware.go
-	mux.Use(WriteToConsole)
+	//mux.Use(WriteToConsole)
 	mux.Use(NoSurf)
 
 	//using middleware we made for sessions
@@ -43,6 +43,21 @@ func Routes(app *config.AppConfig) http.Handler {
 	//and so will work about
 	mux.Get("/", handlers.Repo.Home)
 	mux.Get("/about", handlers.Repo.About)
+
+	mux.Get("/generals-quarters", handlers.Repo.Generals)
+	mux.Get("/majors-suite", handlers.Repo.Majors)
+	mux.Get("/search-availability", handlers.Repo.Availability)
+	mux.Post("/search-availability", handlers.Repo.PostAvailability)
+	mux.Post("/search-availability-json", handlers.Repo.AvailabilityJSON)
+	mux.Get("/contact", handlers.Repo.Contact)
+
+	mux.Get("/make-reservation", handlers.Repo.Reservation)
+    //how to handle static file, javascript and css and images from local files
+	//fileServer is a place to go and get static files from 
+	fileServer := http.FileServer(http.Dir("./static/")) //dir give us directory from ./static/
+	//using fileServer. we are going to handle, look for path name in static/ anything in the directory. StripPrefix takes URL which go gets and modify it for web server/client request into something it knows how to handle
+	//string static and get fileServer
+	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
 	return mux
 }
